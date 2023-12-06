@@ -1,0 +1,27 @@
+Source: gtklock
+Section: misc
+Priority: optional
+Maintainer: Maytham Alsudany <maytha8thedev@gmail.com>
+Rules-Requires-Root: no
+Build-Depends:
+ debhelper-compat (= 13),
+ pkg-config,
+ scdoc,
+ libpam0g-dev,
+ libwayland-dev,
+ libgtk-3-dev,
+ libgtk-layer-shell-dev,
+Standards-Version: 4.6.2
+Homepage: https://github.com/jovanlanik/gtklock
+Vcs-Browser: https://salsa.debian.org/Maytha8/gtklock
+Vcs-Git: https://salsa.debian.org/Maytha8/gtklock.git
+
+Package: gtklock
+Architecture: any
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+Description: GTK-based lockscreen for wayland
+ gtklock is a simple but effective lockscreen for wlroots-based applications,
+ an alternative to swaylock. It features extensive configuration options and
+ can be themed using GTK themes.
