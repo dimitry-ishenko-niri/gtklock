@@ -10,6 +10,46 @@ Copyright:
 License: GPL-3+
 
 Files:
+ include/gtklock.h
+ include/window.h
+ src/gtklock.c
+ src/source.c
+Copyright:
+ 2022 Kenny Levinsen
+ 2022-2023 Jovan Lanik <jox969@gmail.com>
+License: GPL-3+
+
+Files:
+ src/xdg.c
+ include/xdg.h
+Copyright:
+ 2022 Louis DeLosSantos
+ 2022-2023 Jovan Lanik <jox969@gmail.com>
+License: GPL-3+
+
+Files:
+ src/input-inhibitor.c
+Copyright:
+ 2022 Sophie Winter
+ 2022-2023 Jovan Lanik <jox969@gmail.com>
+License: GPL-3+
+
+Files:
+ src/window.c
+Copyright:
+ 2022 Kenny Levinsen
+ 2022 Erik Reider
+ 2022 Melih Darcan
+ 2022-2023 Jovan Lanik <jox969@gmail.com>
+License: GPL-3+
+
+Files:
+ wayland/wlr-input-inhibitor-unstable-v1.xml
+Copyright:
+ 2018 Drew DeVault
+License: NTP
+
+Files:
  debian/*
 Copyright:
  2023 Maytham Alsudany <maytha8thedev@gmail.com>
@@ -31,3 +71,25 @@ License: GPL-3+
 Comment:
  On Debian systems, the complete text of the GNU General
  Public License version 3 can be found in "/usr/share/common-licenses/GPL-3".
+
+License: NTP
+ Permission to use, copy, modify, distribute, and sell this
+ software and its documentation for any purpose is hereby granted
+ without fee, provided that the above copyright notice appear in
+ all copies and that both that copyright notice and this permission
+ notice appear in supporting documentation, and that the name of
+ the copyright holders not be used in advertising or publicity
+ pertaining to distribution of the software without specific,
+ written prior permission.  The copyright holders make no
+ representations about the suitability of this software for any
+ purpose.  It is provided "as is" without express or implied
+ warranty.
+ .
+ THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS
+ SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ FITNESS, IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+ AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+ THIS SOFTWARE.
