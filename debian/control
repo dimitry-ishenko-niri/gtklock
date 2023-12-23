@@ -1,5 +1,5 @@
 Source: gtklock
-Section: misc
+Section: x11
 Priority: optional
 Maintainer: Maytham Alsudany <maytha8thedev@gmail.com>
 Rules-Requires-Root: no
