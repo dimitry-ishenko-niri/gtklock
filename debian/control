@@ -13,8 +13,8 @@ Build-Depends:
  libgtk-layer-shell-dev,
 Standards-Version: 4.6.2
 Homepage: https://github.com/jovanlanik/gtklock
-Vcs-Browser: https://salsa.debian.org/Maytha8/gtklock
-Vcs-Git: https://salsa.debian.org/Maytha8/gtklock.git
+Vcs-Browser: https://salsa.debian.org/debian/gtklock
+Vcs-Git: https://salsa.debian.org/debian/gtklock.git
 
 Package: gtklock
 Architecture: any
