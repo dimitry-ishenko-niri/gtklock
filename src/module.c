@@ -1,14 +1,23 @@
 // gtklock
-// Copyright (c) 2022 Jovan Lanik
+// Copyright (c) 2022 Jovan Lanik, Zephyr Lykos
 
 // Module support
 
 #include "util.h"
 #include "module.h"
 
+#ifndef LIBDIR
+
+#warning LIBDIR not defined.
+
 #ifndef PREFIX
 #warning PREFIX not defined.
-#define PREFIX /usr/local
+#define LIBDIR /usr/local/lib
+#else
+#warning PREFIX is soft-deprecated. Define LIBDIR instead.
+#define LIBDIR PREFIX/lib
+#endif
+
 #endif
 
 #ifndef MAJOR_VERSION
@@ -36,7 +45,7 @@ GModule *module_load(const char *name) {
 		if(g_file_test(name, G_FILE_TEST_IS_REGULAR)) path = g_strdup(name);
 		else {
 			g_free(path);
-			path = g_build_path("/", STR(PREFIX)"/lib/gtklock", name, NULL);
+			path = g_build_path("/", STR(LIBDIR) "/gtklock", name, NULL);
 		}
 	}
 
@@ -75,6 +84,14 @@ void module_on_activation(struct GtkLock *gtklock) {
 		void (*fn)(struct GtkLock *, int) = NULL;
 		GModule *module = g_array_index(gtklock->modules, GModule *, idx);
 		if(g_module_symbol(module, "on_activation", (gpointer *)&fn)) fn(gtklock, idx);
+	}
+}
+
+void module_on_locked(struct GtkLock *gtklock) {
+	for(guint idx = 0; idx < gtklock->modules->len; idx++) {
+		void (*fn)(struct GtkLock *) = NULL;
+		GModule *module = g_array_index(gtklock->modules, GModule *, idx);
+		if(g_module_symbol(module, "on_locked", (gpointer *)&fn)) fn(gtklock);
 	}
 }
 
