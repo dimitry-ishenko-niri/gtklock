@@ -10,7 +10,7 @@ Build-Depends:
  libpam0g-dev,
  libwayland-dev,
  libgtk-3-dev,
- libgtk-layer-shell-dev,
+ libgtk-session-lock-dev,
 Standards-Version: 4.7.0
 Homepage: https://github.com/jovanlanik/gtklock
 Vcs-Browser: https://salsa.debian.org/debian/gtklock
