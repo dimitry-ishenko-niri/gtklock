@@ -5,7 +5,7 @@ Maintainer: Maytham Alsudany <maytha8thedev@gmail.com>
 Rules-Requires-Root: no
 Build-Depends:
  debhelper-compat (= 13),
- pkg-config,
+ meson,
  scdoc,
  libpam0g-dev,
  libwayland-dev,
