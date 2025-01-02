@@ -1,9 +1,9 @@
 # gtklock
-# Copyright (c) 2023 Jianhua Lu, Jovan Lanik
+# Copyright (c) 2023 Jianhua Lu, Jovan Lanik, Zephyr Lykos
 
 project(
   'gtklock', 'c',
-  version : '3.0.0',
+  version : '4.0.0',
   license : 'GPLv3',
   default_options : ['c_std=c11']
 )
@@ -25,6 +25,7 @@ dependencies = [
   pam,
 ]
 
+subdir('po')
 subdir('man')
 subdir('res')
 subdir('src')
@@ -34,13 +35,19 @@ gtklock_set = [
   ui_resources,
 ]
 
+if import('fs').is_absolute(get_option('libdir'))
+  libdir = get_option('libdir')
+else
+  libdir = get_option('prefix') / get_option('libdir')
+endif
+
 executable(
   meson.project_name(),
   gtklock_set,
   include_directories : 'include',
   dependencies : dependencies,
   c_args : [
-    '-DPREFIX=' + get_option('prefix'),
+    '-DLIBDIR=' + libdir,
     '-DMAJOR_VERSION=' + major_version,
     '-DMINOR_VERSION=' + minor_version,
     '-DMICRO_VERSION=' + micro_version,

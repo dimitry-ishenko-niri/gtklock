@@ -9,11 +9,13 @@ Works on sway and other wlroots-based compositors.
 
 ℹ️ __For documentation, check out the [man page](https://man.voidlinux.org/gtklock) and [wiki](https://github.com/jovanlanik/gtklock/wiki).__
 
-Available on these repositories:
+
+## Installing gtklock from a repository
+gtklock is available on these repositories:
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/gtklock.svg)](https://repology.org/project/gtklock/versions)
-### Installing gtklock
-- Arch: `# yay -S gtklock` (using [Yay](https://github.com/Jguer/yay))
+
+- Arch: `# pacman -S gtklock`
 - Gentoo: `# emerge --ask gui-apps/gtklock` (in [GURU repository](https://wiki.gentoo.org/wiki/Project:GURU))
 - Void: `# xbps-install gtklock`
 
@@ -32,8 +34,8 @@ $ ninja -C builddir
 - gtk+3.0
 - [gtk-session-lock](https://github.com/Cu3PO42/gtk-session-lock)
 ### Installing build dependencies
-- Arch: `# yay -S gcc meson pkgconf scdoc pam wayland gtk3 gtk-session-lock`
+- Arch: `# pacman -S gcc meson pkgconf scdoc pam wayland gtk3 gtk-session-lock`
 - Fedora: `# dnf install gcc meson pkgconf scdoc pam-devel wayland-devel gtk3-devel`, install gtk-session-lock manually
-- Void: `# xbps-install gcc meson pkgconf scdoc pam-devel wayland-devel gtk+3-devel`, install gtk-session-lock manually
+- Void: `# xbps-install gcc meson pkgconf scdoc pam-devel wayland-devel gtk+3-devel gtk-session-lock-devel`
 
 ❤️ __Please submit an dependency installation command for your distro!__
