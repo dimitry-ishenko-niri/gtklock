@@ -1,3 +1,12 @@
+gtklock (4.0.0-1) UNRELEASED; urgency=medium
+
+  * New upstream version 4.0.0
+  * Update Vcs-* fields to reflect movement to debian/ namespace
+  * Update Build-Depends
+  * Bump Standards-Version to 4.7.0 (no changes)
+
+ -- Maytham Alsudany <maytha8thedev@gmail.com>  Thu, 02 Jan 2025 23:53:03 +0800
+
 gtklock (2.1.0-1) unstable; urgency=medium
 
   * Initial release. (Closes: #1052418)
