@@ -1,3 +1,15 @@
+gtklock (4.0.0.1-1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * New upstream version 4.0.0.1
+  * Merge tag 'v4.0.0.1' into upstream
+  * Update man page
+  * Fix name
+  * Add option to execute command on idle timeout
+  * Don't reshow windows needlessly
+
+ -- Dimitry Ishenko <dimitry.ishenko@gmail.com>  Tue, 28 Apr 2026 16:08:06 -0400
+
 gtklock (4.0.0-1) unstable; urgency=medium
 
   * New upstream version 4.0.0
