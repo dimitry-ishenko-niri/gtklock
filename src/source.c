@@ -272,7 +272,7 @@ int main(int argc, char **argv) {
 	bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
 	textdomain(GETTEXT_PACKAGE);
 
-	GOptionContext *option_context = g_option_context_new("- GTK-based lockscreen for sway");
+	GOptionContext *option_context = g_option_context_new("- GTK-based lockscreen for Wayland");
 	g_option_context_add_main_entries(option_context, main_entries, NULL);
 	g_option_context_set_help_enabled(option_context, FALSE);
 	g_option_context_set_ignore_unknown_options(option_context, TRUE);
