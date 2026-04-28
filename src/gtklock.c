@@ -85,16 +85,17 @@ void gtklock_idle_show(struct GtkLock *gtklock) {
 	if(gtklock->hidden) {
 		gtklock->hidden = FALSE;
 		module_on_idle_show(gtklock);
+
+		for(guint idx = 0; idx < gtklock->windows->len; idx++) {
+			struct Window *ctx = g_array_index(gtklock->windows, struct Window *, idx);
+			window_idle_show(ctx);
+		}
 	}
 
-	for(guint idx = 0; idx < gtklock->windows->len; idx++) {
-		struct Window *ctx = g_array_index(gtklock->windows, struct Window *, idx);
-		window_idle_show(ctx);
+	if(gtklock->use_idle_hide) {
+		if(gtklock->idle_hide_source > 0) g_source_remove(gtklock->idle_hide_source);
+		gtklock->idle_hide_source = g_timeout_add_seconds(gtklock->idle_timeout, G_SOURCE_FUNC(idle_handler), gtklock);
 	}
-
-	if(!gtklock->use_idle_hide) return;
-	if(gtklock->idle_hide_source > 0) g_source_remove(gtklock->idle_hide_source);
-	gtklock->idle_hide_source = g_timeout_add_seconds(gtklock->idle_timeout, G_SOURCE_FUNC(idle_handler), gtklock);
 }
 
 static void exec_command(const gchar *command) {
