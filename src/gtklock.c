@@ -1,9 +1,10 @@
 // gtklock
-// Copyright (c) 2022 Kenny Levinsen, Jovan Lanik, Bhaskar Khoraja
+// Copyright (c) 2026 Kenny Levinsen, Jovan Lanik, Bhaskar Khoraja
 
 // gtklock application
 
-#include <signal.h>
+#define _POSIX_C_SOURCE
+#include <glib-unix.h>
 #include <gtk/gtk.h>
 
 #include "util.h"
@@ -15,6 +16,7 @@ void gtklock_remove_window(struct GtkLock *gtklock, struct Window *win) {
 	for(guint idx = 0; idx < gtklock->windows->len; idx++) {
 		struct Window *ctx = g_array_index(gtklock->windows, struct Window *, idx);
 		if(ctx == win) {
+			if(gtklock->focused_window == win) gtklock->focused_window = NULL;
 			g_array_remove_index(gtklock->windows, idx);
 			g_free(ctx);
 			return;
@@ -55,21 +57,31 @@ void gtklock_update_dates(struct GtkLock *gtklock) {
 	}
 }
 
-static int gtklock_update_time_handler(gpointer data) {
+static gboolean update_time_handler(gpointer data) {
 	struct GtkLock *gtklock = (struct GtkLock *)data;
 	gtklock_update_clocks(gtklock);
 	gtklock_update_dates(gtklock);
 	return G_SOURCE_CONTINUE;
 }
 
-static int gtklock_idle_handler(gpointer data) {
+static void exec_command(const gchar *command) {
+	GError *err = NULL;
+	g_spawn_command_line_async(command, &err);
+	if(err != NULL) {
+		g_warning("Executing `%s` failed: %s", command, err->message);
+		g_error_free(err);
+	}
+}
+
+static gboolean idle_handler(gpointer data) {
 	struct GtkLock *gtklock = (struct GtkLock *)data;
-	gtklock_idle_hide(gtklock);
+	if(gtklock->use_idle_hide) gtklock_idle_hide(gtklock);
+	if(gtklock->idle_command) exec_command(gtklock->idle_command);
 	return G_SOURCE_CONTINUE;
 }
 
 void gtklock_idle_hide(struct GtkLock *gtklock) {
-	if(!gtklock->use_idle_hide || gtklock->hidden || g_application_get_is_busy(G_APPLICATION(gtklock->app)))
+	if(gtklock->hidden || g_application_get_is_busy(G_APPLICATION(gtklock->app)))
 		return;
 	gtklock->hidden = TRUE;
 	module_on_idle_hide(gtklock);
@@ -84,31 +96,32 @@ void gtklock_idle_show(struct GtkLock *gtklock) {
 	if(gtklock->hidden) {
 		gtklock->hidden = FALSE;
 		module_on_idle_show(gtklock);
+
+		for(guint idx = 0; idx < gtklock->windows->len; idx++) {
+			struct Window *ctx = g_array_index(gtklock->windows, struct Window *, idx);
+			window_idle_show(ctx);
+		}
 	}
 
-	for(guint idx = 0; idx < gtklock->windows->len; idx++) {
-		struct Window *ctx = g_array_index(gtklock->windows, struct Window *, idx);
-		window_idle_show(ctx);
+	if(gtklock->use_idle_hide || gtklock->idle_command) {
+		if(gtklock->idle_hide_source > 0) g_source_remove(gtklock->idle_hide_source);
+		gtklock->idle_hide_source = g_timeout_add_seconds(gtklock->idle_timeout, G_SOURCE_FUNC(idle_handler), gtklock);
 	}
-
-	if(!gtklock->use_idle_hide) return;
-	if(gtklock->idle_hide_source > 0) g_source_remove(gtklock->idle_hide_source);
-	gtklock->idle_hide_source = g_timeout_add_seconds(gtklock->idle_timeout, G_SOURCE_FUNC(gtklock_idle_handler), gtklock);
 }
 
-static void exec_command(const gchar *command) {
-	GError *err = NULL;
-	g_spawn_command_line_async(command, &err);
-	if(err != NULL) {
-		g_warning("Executing `%s` failed: %s", command, err->message);
-		g_error_free(err);
-	}
+static gboolean signal_handler(gpointer data) {
+	struct GtkLock *gtklock = data;
+	g_application_quit(G_APPLICATION(gtklock->app));
+	return FALSE;
 }
 
 static void locked(GtkSessionLockLock *lock, void *data) {
 	struct GtkLock *gtklock = (struct GtkLock *)data;
+
+	g_unix_signal_add(SIGUSR1, G_SOURCE_FUNC(signal_handler), gtklock);
+
 	module_on_locked(gtklock);
-	if(gtklock->parent > 0) kill(gtklock->parent, SIGUSR1);
+	if(gtklock->parent > 0) kill(gtklock->parent, SIGUSR2);
 	if(gtklock->lock_command) exec_command(gtklock->lock_command);
 	return;
 }
@@ -131,11 +144,11 @@ void gtklock_activate(struct GtkLock *gtklock) {
 	gtk_session_lock_lock_lock(gtklock->lock);
 
 
-	gtklock->draw_time_source = g_timeout_add(1000, G_SOURCE_FUNC(gtklock_update_time_handler), gtklock);
+	gtklock->draw_time_source = g_timeout_add(1000, G_SOURCE_FUNC(update_time_handler), gtklock);
 	gtklock_update_clocks(gtklock);
 	gtklock_update_dates(gtklock);
-	if(gtklock->use_idle_hide) gtklock->idle_hide_source =
-		g_timeout_add_seconds(gtklock->idle_timeout, G_SOURCE_FUNC(gtklock_idle_handler), gtklock);
+	if(gtklock->use_idle_hide || gtklock->idle_command) gtklock->idle_hide_source =
+		g_timeout_add_seconds(gtklock->idle_timeout, G_SOURCE_FUNC(idle_handler), gtklock);
 }
 
 void gtklock_shutdown(struct GtkLock *gtklock) {
@@ -150,6 +163,11 @@ void gtklock_shutdown(struct GtkLock *gtklock) {
 
 	gtk_session_lock_lock_unlock_and_destroy(gtklock->lock);
 	gdk_display_sync(gdk_display_get_default());
+
+	for(guint idx = 0; idx < gtklock->windows->len; idx++) {
+		struct Window *ctx = g_array_index(gtklock->windows, struct Window *, idx);
+		gtk_widget_destroy(ctx->window);
+	}
 
 	if(gtklock->unlock_command) exec_command(gtklock->unlock_command);
 }

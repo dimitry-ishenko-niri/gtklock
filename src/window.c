@@ -1,5 +1,5 @@
 // gtklock
-// Copyright (c) 2022 Kenny Levinsen, Jovan Lanik, Erik Reider, Melih Darcan, Bhaskar Khoraja
+// Copyright (c) 2026 Kenny Levinsen, Jovan Lanik, Erik Reider, Melih Darcan, Bhaskar Khoraja
 
 // Window functions
 
@@ -143,6 +143,9 @@ static gboolean window_pw_message(gpointer data) {
 }
 
 static gpointer window_pw_wait(gpointer data) {
+	if (gtklock->test_mode) {
+		g_application_quit(G_APPLICATION(gtklock->app));
+	}
 	struct Window *ctx = data;
 	const char *password = gtk_entry_get_text((GtkEntry*)ctx->input_field);
 	while(TRUE) {
@@ -297,7 +300,7 @@ struct Window *create_window(GdkMonitor *monitor) {
 	g_signal_connect(w->window, "destroy", G_CALLBACK(window_destroy_notify), NULL);
 	if(gtklock->follow_focus)
 		g_signal_connect(w->window, "enter-notify-event", G_CALLBACK(window_enter_notify), NULL);
-	if(gtklock->use_idle_hide || gtklock->hidden) {
+	if(gtklock->use_idle_hide || gtklock->hidden || gtklock->idle_command) {
 		gtk_widget_add_events(w->window, GDK_POINTER_MOTION_MASK);
 		g_signal_connect(w->window, "key-press-event", G_CALLBACK(window_idle_key), NULL);
 		g_signal_connect(w->window, "motion-notify-event", G_CALLBACK(window_idle_motion), NULL);

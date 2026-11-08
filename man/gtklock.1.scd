@@ -25,6 +25,9 @@ gtklock [options...]
 	in the following order: $XDG_CONFIG_HOME/gtklock/config.ini and
 	gtklock/config.ini under each directory in $XDG_CONFIG_DIRS.
 
+*-p, --preview*
+	Enable preview mode where any password can unlock
+
 # CONFIGURATION
 
 Configuration is stored in glib key file format. Options are specified as
@@ -76,6 +79,9 @@ All available options are:
 *-U, --unlock-command*
 	Command to execute after unlocking. Command is executed asynchronously.
 
+*-I, --idle-command*
+	Command to execute after idle timeout. Command is executed asynchronously.
+
 *-M, --monitor-priority* <name>
 	Set monitor focus priority. Option can be specified multiple times.
 
@@ -99,6 +105,11 @@ window {
    background-color: black;
 }
 ```
+
+# SIGNALS
+
+*SIGUSR1*
+	Unlock the screen and exit.
 
 # AUTHORS
 

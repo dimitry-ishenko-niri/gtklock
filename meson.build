@@ -1,9 +1,9 @@
 # gtklock
-# Copyright (c) 2023 Jianhua Lu, Jovan Lanik, Zephyr Lykos
+# Copyright (c) 2026 Jianhua Lu, Jovan Lanik, Zephyr Lykos
 
 project(
   'gtklock', 'c',
-  version : '4.0.0',
+  version : '5.0.0',
   license : 'GPLv3',
   default_options : ['c_std=c11']
 )
@@ -16,7 +16,7 @@ micro_version = version[2]
 gtk = dependency('gtk+-3.0')
 gtk_session_lock = dependency('gtk-session-lock-0')
 gmodule_export = dependency('gmodule-export-2.0')
-pam = dependency('pam')
+pam = meson.get_compiler('c').find_library('pam')
 
 dependencies = [
   gtk,

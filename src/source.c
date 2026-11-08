@@ -1,5 +1,5 @@
 // gtklock
-// Copyright (c) 2022 Kenny Levinsen, Jovan Lanik, Bhaskar Khoraja
+// Copyright (c) 2026 Kenny Levinsen, Jovan Lanik, Bhaskar Khoraja
 
 #define _POSIX_C_SOURCE 200809L
 
@@ -40,6 +40,7 @@ static gboolean should_daemonize = FALSE;
 static gboolean follow_focus = FALSE;
 static gboolean idle_hide = FALSE;
 static gboolean start_hidden = FALSE;
+static gboolean test_mode = FALSE;
 
 static gint idle_timeout = 15;
 
@@ -53,12 +54,14 @@ static gchar *time_format = NULL;
 static gchar *date_format = NULL;
 static gchar *lock_command = NULL;
 static gchar *unlock_command = NULL;
+static gchar *idle_command = NULL;
 static gchar **monitor_priority = NULL;
 
 static GOptionEntry main_entries[] = {
 	{ "version", 'v', 0, G_OPTION_ARG_NONE, &show_version, "Show version", NULL },
 	{ "config", 'c', 0, G_OPTION_ARG_FILENAME, &config_path, "Load config file", NULL },
 	{ "daemonize", 'd', 0, G_OPTION_ARG_NONE, &should_daemonize, "Detach from controlling terminal", NULL },
+	{ "preview", 'p', 0, G_OPTION_ARG_NONE, &test_mode, "Enable preview mode where any password can unlock", NULL },
 	{ NULL },
 };
 
@@ -76,6 +79,7 @@ static GOptionEntry config_entries[] = {
 	{ "start-hidden", 'S', 0, G_OPTION_ARG_NONE, &start_hidden, "Start with hidden form", NULL },
 	{ "lock-command", 'L', 0, G_OPTION_ARG_STRING, &lock_command, "Command to execute after locking", NULL },
 	{ "unlock-command", 'U', 0, G_OPTION_ARG_STRING, &unlock_command, "Command to execute after unlocking", NULL },
+	{ "idle-command", 'I', 0, G_OPTION_ARG_STRING, &idle_command, "Command to execute after idle timeout", NULL },
 	{ "monitor-priority", 'M', 0, G_OPTION_ARG_STRING_ARRAY, &monitor_priority, "Set monitor focus priority", NULL },
 	{ NULL },
 };
@@ -97,11 +101,17 @@ static void monitors_removed(GdkDisplay *display, GdkMonitor *monitor, gpointer 
 	struct Window *w = window_by_monitor(monitor);
 	if(w != NULL) {
 		if(gtklock->focused_window == w) {
-			struct Window *any_window = g_array_index(gtklock->windows, struct Window*, 0);
-			if(any_window == w) any_window = g_array_index(gtklock->windows, struct Window*, 1);
+			struct Window *any_window = NULL;
+			for(guint idx = 0; idx < gtklock->windows->len; idx++) {
+				struct Window *ctx = g_array_index(gtklock->windows, struct Window *, idx);
+				if(ctx != w) {
+					any_window = ctx;
+					break;
+				}
+			}
 
-			gtklock->focused_window = NULL;
-			if(any_window) window_swap_focus(any_window, w);
+			if(any_window) gtklock_focus_window(gtklock, any_window);
+			else gtklock->focused_window = NULL;
 		}
 		gtk_session_lock_unmap_lock_window(GTK_WINDOW(w->window));
 		gtk_widget_destroy(w->window);
@@ -183,11 +193,11 @@ static void activate(GtkApplication *app, gpointer user_data) {
 }
 
 static void shutdown(GtkApplication *app, gpointer user_data) {
+	gtklock_shutdown(gtklock);
 	for(guint idx = 0; idx < gtklock->modules->len; idx++) {
 		GModule *module = g_array_index(gtklock->modules, GModule *, idx);
 		g_module_close(module);
 	}
-	gtklock_shutdown(gtklock);
 }
 
 static void attach_style(const gchar *format, ...) G_GNUC_PRINTF(1, 2);
@@ -237,10 +247,10 @@ static void daemonize(void) {
 		if(WIFEXITED(status) && WEXITSTATUS(status) == EXIT_SUCCESS) {
 			sigset_t set;
 			sigemptyset(&set);
-			sigaddset(&set, SIGUSR1);
+			sigaddset(&set, SIGUSR2);
 			sigprocmask(SIG_BLOCK, &set, NULL);
 			int ret = sigtimedwait(&set, NULL, &(struct timespec){ 1, 0 });
-			if(ret == SIGUSR1)
+			if(ret == SIGUSR2)
 				exit(EXIT_SUCCESS);
 			exit(EXIT_FAILURE);
 		}
@@ -270,7 +280,7 @@ int main(int argc, char **argv) {
 	bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
 	textdomain(GETTEXT_PACKAGE);
 
-	GOptionContext *option_context = g_option_context_new("- GTK-based lockscreen for sway");
+	GOptionContext *option_context = g_option_context_new("- GTK-based lockscreen for Wayland");
 	g_option_context_add_main_entries(option_context, main_entries, NULL);
 	g_option_context_set_help_enabled(option_context, FALSE);
 	g_option_context_set_ignore_unknown_options(option_context, TRUE);
@@ -343,6 +353,7 @@ int main(int argc, char **argv) {
 
 	gtklock->hidden = start_hidden;
 	gtklock->idle_timeout = (guint)idle_timeout;
+	gtklock->test_mode = test_mode;
 
 	gtklock->follow_focus = follow_focus;
 	gtklock->use_idle_hide = idle_hide;
@@ -353,6 +364,7 @@ int main(int argc, char **argv) {
 	gtklock->layout_path = layout_path;
 	gtklock->lock_command = lock_command;
 	gtklock->unlock_command = unlock_command;
+	gtklock->idle_command = idle_command;
 
 	gtklock->modules = modules;
 

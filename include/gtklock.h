@@ -1,5 +1,5 @@
 // gtklock
-// Copyright (c) 2022 Kenny Levinsen, Jovan Lanik, Bhaskar Khoraja
+// Copyright (c) 2026 Kenny Levinsen, Jovan Lanik, Bhaskar Khoraja
 
 // gtklock application
 
@@ -37,8 +37,11 @@ struct GtkLock {
 	char *layout_path;
 	char *lock_command;
 	char *unlock_command;
+	char *idle_command;
 
 	GArray *modules;
+
+	gboolean test_mode;
 };
 
 void gtklock_remove_window(struct GtkLock *gtklock, struct Window *win);
