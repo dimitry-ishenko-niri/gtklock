@@ -1,3 +1,78 @@
+gtklock (5.0.0-1~pre1) unstable; urgency=medium
+
+  [ Dimitry Ishenko ]
+  * New upstream version 5.0.0
+  * Update man page
+  * Fix name
+  * Add option to execute command on idle timeout
+  * Don't reshow windows needlessly
+
+  [ Jovan Lanik ]
+  * update readme
+  * update year in copyright headers
+  * update man page
+  * Merge pull request #158 from volker-fr/fix-monitor-removed-uaf
+  * Merge pull request #154 from davidemanini/master
+  * Merge pull request #149 from dimitry-ishenko-niri/idle-command
+  * Merge pull request #144 from SleepyLeslie/master
+  * Merge pull request #156 from joericmar/translation-es
+  * Merge pull request #150 from Pierre-Thibault/french_translation
+  * Merge pull request #147 from EkaterinePapava/master
+  * Merge pull request #137 from Szafranek13/master
+  * update man page
+  * add unlock signal
+  * Merge pull request #135 from Secret-chest/romanian-localisation
+  * Merge pull request #127 from eugene-lesnov/russian-translate
+  * Merge pull request #124 from arthsmn/master
+  * update
+  * Merge pull request #110 from knm100/master
+  * Merge pull request #108 from ziyao233/master
+  * update
+  * update
+
+  [ Volker ]
+  * Fix use-after-free when the focused monitor is removed
+
+  [ Joel Rico Martínez ]
+  * po: add Spanish translation
+
+  [ Davide Manini ]
+  * Add dependency instructions for Debian
+
+  [ Pierre Thibault ]
+  * Adding French translation.
+
+  [ Ekaterine Papava ]
+  * po: Add Georgian translation
+  * po: Add Georgian translation
+
+  [ Leslie H. ]
+  * Add preview mode
+
+  [ Jakub Fabijan ]
+  * Add Esperanto translation
+
+  [ Vlad ]
+  * Add Romanian translation
+
+  [ Eugene Lesnov ]
+  * feat: added russian translate
+
+  [ arthsmn ]
+  * Update LINGUAS
+  * Create pt_BR.po
+
+  [ knm100 ]
+  * Update LINGUAS
+  * Update zh_CN.po
+  * Update zh_CN.po
+  * Create zh_CN.po
+
+  [ Yao Zi ]
+  * Add missing feature test macro to fix musl build
+
+ -- Dimitry Ishenko <dimitry.ishenko@gmail.com>  Sun, 08 Nov 2026 17:18:13 -0500
+
 gtklock (4.0.0-1) unstable; urgency=medium
 
   * New upstream version 4.0.0
